@@ -1,0 +1,194 @@
+#!/bin/bash
+
+# Author: @Th3Zer0
+#
+# This file is released under Public Domain.
+# Feel Free. Be Free. ;)
+
+unset ALL_OFF BOLD BLUE RED
+ALL_OFF="\e[1;0m"
+BOLD="\e[1;1m"
+RED="${BOLD}\e[1;31m"
+BLUE="${BOLD}\e[1;34m"
+readonly ALL_OFF BOLD BLUE RED
+
+help() {
+	printf "${BLUE}apk2java${ALL_OFF} Linux - Author: Davide 'TheZero' Silvetti\n" >&2
+	echo "Usage: $0 [smali] <file>.apk"
+	echo " Write 'smali' for disassemble .dex source code" 
+}
+
+error() {
+	local mesg=$1; shift
+	printf "${BOLD}[ ${RED}E${ALL_OFF}${BOLD} ]${ALL_OFF} ${mesg}\n" "$@" >&2
+}
+
+SMALI="0"
+
+if [ $# = '1' ]; then
+	check=`echo $1 | grep ".apk"`
+	if [ "$check" = "" ]; then
+		error "Select a valid .apk file!"
+		echo ""
+		help
+	fi
+elif [ $# = '2' ]; then
+	if [ $2 = "smali" -o $1 = "smali" ]; then
+		SMALI="1"
+		echo "smali"
+	else
+		error "Invalid option: $2"
+		echo ""
+		help
+		exit 2
+	fi
+else
+	help
+	exit 1
+fi
+
+HOME="/opt/apk2java"
+
+FILENAME=$1
+FILEDIR=`echo $FILENAME | sed -nr 's|(.*)/.*$|\1|p'`
+cd $FILEDIR
+FILEDIR=`pwd`
+FILE=`echo $FILENAME | sed -nr 's|.*/(.*)$|\1|p'`
+PROJECT=`echo $FILE | sed -nr 's|(.*).apk$|\1|p'`
+
+
+CLASSPATH=
+
+cd $HOME
+
+echo "*********************************************"
+echo "**          Convert 'apk' to 'jar'         **"
+echo "*********************************************"
+
+for i in `ls $HOME/lib/*.jar`; do
+	CLASSPATH=${CLASSPATH:-}"$i:"
+done
+
+java -Xms512m -Xmx1024m -classpath "${CLASSPATH}" "com.googlecode.dex2jar.tools.Dex2jarCmd" "$FILEDIR/$FILE" --force
+
+echo "*********************************************"
+echo "**    Remove if any 'src' folder exists    **"
+echo "*********************************************"
+
+if [ -d $HOME/src ]; then
+	rm -r $HOME/src
+fi
+if [ -d $HOME/class ]; then
+	rm -r $HOME/class
+fi
+
+echo "*********************************************"
+echo "**    Create 'src' and 'class' folders     **"
+echo "*********************************************"
+
+mkdir $HOME/src
+mkdir $HOME/class
+
+echo "*********************************************"
+echo "**     Expand, delete the 'jar' file       **"
+echo "*********************************************"
+
+DIR="class"
+
+for i in `ls $HOME/*.jar`; do
+	unzip -o $i -d $DIR
+	rm $i
+done
+
+echo "*********************************************"
+echo "**        Decompiling class files          **"
+echo "*********************************************"
+
+for i in `ls $HOME/class`; do
+	cp -R "$HOME/class/$i" ./src
+done
+
+for i in `ls -1R $HOME/src`; do
+	d=`echo $i | sed -nr 's|^(.*):$|\1|p'`
+	if [ "$d" != "" ]; then
+		cd $HOME
+		if [ -d $d ]; then
+			cd $d
+			DIR=`pwd`
+		fi
+	fi
+	
+	f=`echo $i | grep ".class"`
+	if [ "$f" != "" ]; then
+		if [ -f "$f" ]; then
+			$HOME/tool/jad -d $DIR -o -s .java $f
+		fi
+	fi
+done
+
+echo "*********************************************"
+echo "** Delete .class files and 'class' folder  **"
+echo "*********************************************"
+
+cd $HOME
+for i in `ls -1R $HOME/src`; do
+	d=`echo $i | sed -nr 's|^(.*):$|\1|p'`
+	if [ "$d" != "" ]; then
+		cd $HOME
+		if [ -d $d ]; then
+			cd $d
+			DIR=`pwd`
+		fi
+	fi
+	
+	f=`echo $i | grep ".class"`
+	if [ "$f" != "" ]; then
+		if [ -f "$f" ]; then
+			rm $f
+		fi
+	fi
+done
+cd $HOME
+rm -R class
+
+echo "*********************************************"
+echo "**      Extract, fix resource files        **"
+echo "*********************************************"
+
+cd $HOME
+java -jar "./tool/apktool.jar" decode -s -f $FILEDIR/$FILE ./other/
+
+if [ $SMALI == '1' ]; then
+	echo "*********************************************"
+	echo "**          Disassemble smali              **"
+	echo "*********************************************"
+	
+	java -jar $HOME/tool/baksmali-1.4.0.jar -o ./other/smali ./other/classes.dex
+fi
+
+echo "*********************************************"
+echo "**       Create the Eclipse Project        **"
+echo "*********************************************"
+
+rm -r $FILEDIR/$PROJECT
+unzip -o $HOME/tool/eclipseproject.zip -d $FILEDIR/$PROJECT
+cp -Rf ./src $FILEDIR/$PROJECT 
+cd ./other
+cp -Rf ./ $FILEDIR/$PROJECT
+PACKAGE=`cat $FILEDIR/$PROJECT/AndroidManifest.xml | sed -nr 's|.*package="(.*)"|\1|p'`
+str="2a\\\t<name>${PACKAGE}</name>"
+sed -i $str $FILEDIR/$PROJECT/.project
+
+echo "*********************************************"
+echo "**            Clean temp folder            **"
+echo "*********************************************"
+
+cd $HOME
+rm -r ./src
+rm -r ./other
+                                      
+echo "*********************************************"
+echo "**            Process complete             **"
+echo "*********************************************"
+
+exit
