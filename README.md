@@ -27,7 +27,7 @@ or
 
 Usage
 --------------------
-	$ apk2java \[smali\] <file>.apk
+	$ apk2java [smali] <file>.apk
 
 Note: The smali option is optional
 
@@ -38,6 +38,10 @@ JRE 1.6 (Java Runtime Environment)
 Tools used
 --------------------
 Dex2jar : http://code.google.com/p/dex2jar/
+
 JAD : http://www.varaneckas.com/jad
+
 apk-tool : http://code.google.com/p/android-apktool/
+
 baksmali : http://code.google.com/p/smali/
+
