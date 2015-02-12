@@ -39,7 +39,7 @@ Tools used
 --------------------
 Dex2jar : http://code.google.com/p/dex2jar/
 
-JAD : http://www.varaneckas.com/jad
+Procyon : https://bitbucket.org/mstrobel/procyon/wiki/Java%20Decompiler
 
 apk-tool : http://code.google.com/p/android-apktool/
 
