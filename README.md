@@ -6,34 +6,29 @@ This project is a porting for Linux/*nix of https://github.com/rajivvishwa/apk2j
 
 Introduction
 --------------------
-This batch file decompiles an apk to its corresponding java sources. Security code review can be done on theses generated applicaion source files so as to identify any potential vulnerabilities present. 
+This script decompiles an apk to its corresponding java sources. Security code review can be done on theses generated applicaion source files so as to identify any potential vulnerabilities present. 
 This is not made to encourage piracy/plagiarism. 
 
  *** This script just automates the sequence in which various tools are initiated and does not handle any error events. You will have to go through the cmd verbose to figure out the problem.  ***
 
-Install
---------------------
-Just execute the install.sh file from a ROOT terminal
-
-    # ./install.sh
-
-For uninstall the script type in a ROOT terminal:
-
-    # ./uninstall.sh
-    
-or
-
-    # /opt/apk2java/uninstall.sh
-
 Usage
 --------------------
-	$ apk2java [smali] <file>.apk
+```
+Usage: apk2java.py action file [options]
 
-Note: The smali option is optional
+Options:
+  -h, --help   show this help message and exit
+  --java       select java source format [DEFAULT]
+  --smali      select smali source format
+  --jasmin     select jasmin source format
+  --no-source  no source code generation
+```
 
 Requirements
 --------------------
-JRE 1.6 (Java Runtime Environment)
+JRE 1.7 (Java Runtime Environment)
+Python 3
+
 
 Tools used
 --------------------
