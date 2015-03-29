@@ -14,8 +14,9 @@ This is not made to encourage piracy/plagiarism.
 Usage
 --------------------
 ```
-Usage: apk2java.py action file [options]
+Usage: apk2java.py action ApkFileName [options]
 
+action can only be 'b' (for build) and 'd' (for decompile)
 Options:
   -h, --help   show this help message and exit
   --java       select java source format [DEFAULT]
@@ -39,4 +40,6 @@ Procyon : https://bitbucket.org/mstrobel/procyon/wiki/Java%20Decompiler
 apk-tool : http://code.google.com/p/android-apktool/
 
 baksmali : http://code.google.com/p/smali/
+
+Note: These tools and a smaple apk is downloaded by the script. There is not need to download them manually
 
