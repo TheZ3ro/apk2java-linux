@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 
@@ -12,8 +12,9 @@ apk_file=''
 apk_folder=''
 project_name=''
 sign_file=''
+cwd=os.path.dirname(os.path.abspath(__file__))
 home=os.path.dirname(os.path.realpath(sys.argv[0]))
-tmp='/tmp/apk2java/'
+tmp=cwd+'/apk2java/'
 external="https://github.com/TheZ3ro/apk2java-linux/releases/download/tool/tool.zip"
 
 def check_home(path):
@@ -130,16 +131,16 @@ def main():
   parser.add_option("--no-source",action="store_true", dest="nosc", default=False, help="no source code generation")
   (options, args) = parser.parse_args()
 
-  if home == "/opt/apk2java":
+  if home == cwd+"/apk2java":
     if check_home(home) == False:
       getunzipped(external, home, report)
   else:
     if check_home(home) == False:
-      if check_home("/opt/apk2java") == False:
-        getunzipped(external, "/opt/apk2java", report)
-        home = "/opt/apk2java"
+      if check_home(cwd+"/apk2java") == False:
+        getunzipped(external, cwd+"/apk2java", report)
+        home = cwd+"/apk2java"
       else:
-        home = "/opt/apk2java"
+        home = cwd+"/apk2java"
 
   if (options.smali+options.jasmin+options.nosc) > 1:
     print ("[ ERROR ] You can only select 1 source format --[smali/jasmin/java/no-source]")
