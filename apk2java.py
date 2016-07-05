@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 
@@ -149,7 +149,7 @@ def main():
       if os.path.isfile(args[1]) and os.path.splitext(args[1])[-1].lower() == '.apk':
         apk_file = args[1]
         project_name = os.path.splitext(os.path.basename(args[1]))[0].lower()
-        call("cp "+apk_file+" "+tmp+project_name+"-new.apk",shell=True)
+        #call("cp "+apk_file+" "+tmp+project_name+"-new.apk",shell=True)
         if options.jasmin == True:
           dex2jar()
           jar2jasmin()
@@ -158,6 +158,7 @@ def main():
           if options.smali == False and options.nosc == False:
             dex2jar()
             procyon()
+        call("cp "+tmp+project_name+"/ ./ -R",shell=True)
       else:
         print ("[ ERROR ] You must select a valid APK file!")
         exit(1)
@@ -172,6 +173,7 @@ def main():
         else:
           print ("[ ERROR ] Can't build apk with that source format. Only Jasmin or Smali supported")
         sign()
+        call("cp "+sign_file+" ./",shell=True)
     else:
       parser.error("action can be only 'b' (build) or 'd' (decompile)")
   else:
