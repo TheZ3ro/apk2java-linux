@@ -21,6 +21,8 @@ def check_home(path):
   return os.path.isdir(path+"/tool")
 
 def getunzipped(theurl, thedir, report):
+  if not os.path.exists(thedir):
+    os.mkdir(thedir)
   print ("Downloading external tool... -> "+thedir+"/tool/")
   name = os.path.join(thedir, 'temp.zip')
   try:
