@@ -163,7 +163,7 @@ def main():
         if not os.path.exists(outdir):
           os.makedirs(outdir)
         
-	call(["cp", apk_file, outdir+project_name+"-new.apk"])
+        call(["cp", apk_file, outdir+project_name+"-new.apk"])
         if options.jasmin == True:
           dex2jar()
           jar2jasmin()
