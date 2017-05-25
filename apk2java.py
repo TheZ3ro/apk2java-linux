@@ -9,9 +9,9 @@ import subprocess
 from optparse import OptionParser
 
 
-def call(cmd, shell=True, **kwargs):
-    print('Running: {0}'.format(cmd))
-    return subprocess.call(cmd, shell=shell, **kwargs)
+def call(cmd, **kwargs):
+    print('Running: {0}'.format(' '.join(cmd)))
+    return subprocess.call(cmd, **kwargs)
 
 
 apk_file = ''
