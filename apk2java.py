@@ -77,7 +77,7 @@ def print_header(text):
 def apktool(smali):
     print_header('Extract, fix resource files')
     if apk_file != '':
-        cmd = [home + '/tool/apktool_200rc3.jar', 'd', apk_file, '-o ' + outdir + project_name, '-f']
+        cmd = [home + '/tool/apktool_200rc3.jar', 'd', apk_file, '-o',outdir + project_name, '-f']
         if smali == True:
             cmd[-1] = '-sf'
 
@@ -89,7 +89,7 @@ def apktool(smali):
 def dex2jar():
     print_header("Convert 'apk' to 'jar'")
     if apk_file != '':
-        call([home + '/tool/dex2jar-0.0.9.15/d2j-dex2jar.sh', '-f', '-o' + outdir + project_name + '.jar', apk_file])
+        call([home + '/tool/dex2jar-0.0.9.15/d2j-dex2jar.sh', '-f', '-o', outdir + project_name + '.jar', apk_file])
         call([home + '/tool/dex2jar-0.0.9.15/d2j-asm-verify.sh', outdir + project_name + '.jar'])
         print('Done')
 
@@ -97,7 +97,7 @@ def dex2jar():
 def procyon():
     print_header('Decompiling class files')
     if apk_file != '':
-        call([home + '/tool/procyon-decompiler-0528.jar', '-jar ' + outdir + project_name + '.jar',
+        call([home + '/tool/procyon-decompiler-0528.jar', '-jar', outdir + project_name + '.jar',
               '-o ' + outdir + project_name + '/src/'])
         print('Done')
 
@@ -105,7 +105,7 @@ def procyon():
 def apktool_build():
     print_header('Building apk from smali')
     if apk_folder != '':
-        call([home + '/tool/apktool_200rc3.jar', 'b ' + apk_folder, ' -o ' + outdir + project_name + '-rebuild.apk'])
+        call([home + '/tool/apktool_200rc3.jar', 'b', apk_folder, ' -o', outdir + project_name + '-rebuild.apk'])
         global sign_file
         sign_file = outdir + project_name + '-rebuild.apk'
         print('Done')
@@ -114,7 +114,7 @@ def apktool_build():
 def jar2jasmin():
     print_header("Convert 'jar' to 'jasmin'")
     if apk_file != '':
-        call([home + '/tool/dex2jar-0.0.9.15/d2j-jar2jasmin.sh', '-f', '-o ' + outdir + project_name + '/jasmin',
+        call([home + '/tool/dex2jar-0.0.9.15/d2j-jar2jasmin.sh', '-f', '-o', outdir + project_name + '/jasmin',
               outdir + project_name + '.jar'])
         print('Done')
 
@@ -122,12 +122,12 @@ def jar2jasmin():
 def jasmin_build():
     print_header('Build apk from jasmin')
     if apk_folder != '':
-        call([home + '/tool/dex2jar-0.0.9.15/d2j-jasmin2jar.sh', '-f', '-o ' + outdir + project_name + '-new.jar',
+        call([home + '/tool/dex2jar-0.0.9.15/d2j-jasmin2jar.sh', '-f', '-o', outdir + project_name + '-new.jar',
               outdir + project_name + '/jasmin'])
         call([home + '/tool/dex2jar-0.0.9.15/d2j-asm-verify.sh', outdir + project_name + '-new.jar'])
-        call([home + '/tool/dex2jar-0.0.9.15/d2j-jar2dex.sh', '-f', '-o ' + outdir + project_name + '/classes.dex',
+        call([home + '/tool/dex2jar-0.0.9.15/d2j-jar2dex.sh', '-f', '-o', outdir + project_name + '/classes.dex',
               outdir + project_name + '-new.jar'])
-        call(['zip', '-r ' + outdir + project_name + '-new.apk', '-j ' + outdir + project_name + '/classes.dex'])
+        call(['zip', '-r ' + outdir + project_name + '-new.apk', '-j', outdir + project_name + '/classes.dex'])
         global sign_file
         sign_file = outdir + project_name + '-new.apk'
         print('Done')
@@ -135,7 +135,7 @@ def jasmin_build():
 
 def sign():
     print_header('Sign apk')
-    call([home + '/tool/dex2jar-0.0.9.15/d2j-apk-sign.sh', '-f', '-o ' + outdir + project_name + '-signed.apk',
+    call([home + '/tool/dex2jar-0.0.9.15/d2j-apk-sign.sh', '-f', '-o', outdir + project_name + '-signed.apk',
           sign_file])
     print('Done')
 
