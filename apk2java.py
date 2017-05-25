@@ -77,11 +77,12 @@ def print_header(text):
 def apktool(smali):
     print_header('Extract, fix resource files')
     if apk_file != '':
-        cmd = [home + '/tool/apktool_200rc3.jar', 'd', apk_file, '-o',outdir + project_name, '-f']
-        if smali == True:
+        cmd = [home + '/tool/apktool_200rc3.jar', 'd', apk_file, '-o', outdir + project_name, '-f']
+
+        if smali:
             cmd[-1] = '-sf'
 
-        call(cmd, shell=True)
+        call(cmd)
         call(['mv', outdir + project_name + '/classes.dex', outdir + project_name + '/original/'])
     print('Done')
 
@@ -98,14 +99,14 @@ def procyon():
     print_header('Decompiling class files')
     if apk_file != '':
         call([home + '/tool/procyon-decompiler-0528.jar', '-jar', outdir + project_name + '.jar',
-              '-o ' + outdir + project_name + '/src/'])
+              '-o', outdir + project_name + '/src/'])
         print('Done')
 
 
 def apktool_build():
     print_header('Building apk from smali')
     if apk_folder != '':
-        call([home + '/tool/apktool_200rc3.jar', 'b', apk_folder, ' -o', outdir + project_name + '-rebuild.apk'])
+        call([home + '/tool/apktool_200rc3.jar', 'b', apk_folder, '-o', outdir + project_name + '-rebuild.apk'])
         global sign_file
         sign_file = outdir + project_name + '-rebuild.apk'
         print('Done')
