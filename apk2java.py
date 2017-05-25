@@ -5,8 +5,12 @@
 import sys, os, string
 import urllib.request
 import zipfile
-from subprocess import call
+import subprocess
 from optparse import OptionParser
+
+def call(cmd, shell=True, **kwargs):
+   print('Running: {0}'.format(cmd))
+   return subprocess.call(cmd, shell=shell, **kwargs)
 
 apk_file=''
 apk_folder=''
@@ -61,11 +65,12 @@ def apktool(smali):
   print ("**      Extract, fix resource files        **")
   print ("*********************************************")
   if apk_file != '':
+    cmd = [home+'/tool/apktool_200rc3.jar', 'd', apk_file, '-o ' + outdir + project_name, '-f']
     if smali == True:
-      call(home+'/tool/apktool_200rc3.jar d '+apk_file+' -o '+outdir+project_name+' -f',shell=True)
-    else:
-      call(home+'/tool/apktool_200rc3.jar d '+apk_file+' -o '+outdir+project_name+' -sf',shell=True)
-      os.system('mv %s %s' % (outdir+project_name+'/classes.dex', outdir+project_name+'/original/'))
+      cmd[-1] = '-sf'
+    
+    call(cmd,shell=True)
+    call(['mv', outdir+project_name+'/classes.dex', outdir+project_name+'/original/'])
   print ('Done')
 
 def dex2jar():
@@ -73,8 +78,8 @@ def dex2jar():
   print ("**          Convert 'apk' to 'jar'         **")
   print ("*********************************************")
   if apk_file != '':
-    call(home+'/tool/dex2jar-0.0.9.15/d2j-dex2jar.sh -f -o '+outdir+project_name+'.jar '+apk_file, shell=True)
-    call(home+'/tool/dex2jar-0.0.9.15/d2j-asm-verify.sh '+outdir+project_name+'.jar',shell=True)
+    call([home+'/tool/dex2jar-0.0.9.15/d2j-dex2jar.sh', '-f', '-o' + outdir + project_name + '.jar', apk_file])
+    call([home+'/tool/dex2jar-0.0.9.15/d2j-asm-verify.sh', outdir+project_name+'.jar'])
     print ('Done')
 
 def procyon():
@@ -82,7 +87,7 @@ def procyon():
   print ("**        Decompiling class files          **")
   print ("*********************************************")
   if apk_file != '':
-    call(home+'/tool/procyon-decompiler-0528.jar -jar '+outdir+project_name+'.jar -o '+outdir+project_name+'/src/',shell=True)
+    call([home+'/tool/procyon-decompiler-0528.jar', '-jar '+outdir+project_name+'.jar', '-o '+outdir+project_name+'/src/'])
     print ('Done')
 
 def apktool_build():
@@ -90,7 +95,7 @@ def apktool_build():
   print ("**        Building apk from smali          **")
   print ("*********************************************")
   if apk_folder != '':
-    call(home+'/tool/apktool_200rc3.jar b '+apk_folder+' -o '+outdir+project_name+'-rebuild.apk',shell=True)
+    call([home+'/tool/apktool_200rc3.jar', 'b '+apk_folder, ' -o '+outdir+project_name+'-rebuild.apk'])
     global sign_file
     sign_file = outdir+project_name+'-rebuild.apk'
     print ('Done')
@@ -100,7 +105,7 @@ def jar2jasmin():
   print ("**        Convert 'jar' to 'jasmin'        **")
   print ("*********************************************")
   if apk_file != '':
-    call(home+'/tool/dex2jar-0.0.9.15/d2j-jar2jasmin.sh -f -o '+outdir+project_name+'/jasmin '+outdir+project_name+'.jar',shell=True)
+    call([home+'/tool/dex2jar-0.0.9.15/d2j-jar2jasmin.sh', '-f', '-o '+outdir+project_name+'/jasmin', outdir+project_name+'.jar'])
     print ('Done')
 
 def jasmin_build():
@@ -108,10 +113,10 @@ def jasmin_build():
   print ("**          Build apk from jasmin          **")
   print ("*********************************************")
   if apk_folder != '':
-    call(home+'/tool/dex2jar-0.0.9.15/d2j-jasmin2jar.sh -f -o '+outdir+project_name+'-new.jar '+outdir+project_name+'/jasmin',shell=True)
-    call(home+'/tool/dex2jar-0.0.9.15/d2j-asm-verify.sh '+outdir+project_name+'-new.jar',shell=True)
-    call(home+'/tool/dex2jar-0.0.9.15/d2j-jar2dex.sh -f -o '+outdir+project_name+'/classes.dex '+outdir+project_name+'-new.jar',shell=True)
-    call('zip -r '+outdir+project_name+'-new.apk -j '+outdir+project_name+'/classes.dex',shell=True)
+    call([home+'/tool/dex2jar-0.0.9.15/d2j-jasmin2jar.sh', '-f', '-o '+outdir+project_name+'-new.jar', outdir+project_name+'/jasmin'])
+    call([home+'/tool/dex2jar-0.0.9.15/d2j-asm-verify.sh', outdir+project_name+'-new.jar'])
+    call([home+'/tool/dex2jar-0.0.9.15/d2j-jar2dex.sh', '-f', '-o '+outdir+project_name+'/classes.dex', outdir+project_name+'-new.jar'])
+    call(['zip', '-r '+outdir+project_name+'-new.apk', '-j '+outdir+project_name+'/classes.dex'])
     global sign_file
     sign_file = outdir+project_name+'-new.apk'
     print ('Done')
@@ -120,7 +125,7 @@ def sign():
   print ("*********************************************")
   print ("**                Sign apk                 **")
   print ("*********************************************")
-  call(home+'/tool/dex2jar-0.0.9.15/d2j-apk-sign.sh -f -o '+outdir+project_name+'-signed.apk '+sign_file,shell=True)
+  call([home+'/tool/dex2jar-0.0.9.15/d2j-apk-sign.sh', '-f', '-o '+outdir+project_name+'-signed.apk', sign_file])
   print ('Done')
 
 def main():
@@ -157,7 +162,8 @@ def main():
         project_name = os.path.splitext(os.path.basename(args[1]))[0].lower()
         if not os.path.exists(outdir):
           os.makedirs(outdir)
-        call("cp "+apk_file+" "+outdir+project_name+"-new.apk",shell=True)
+        
+	"cp "+apk_file+" "+outdir+project_name+"-new.apk",shell=True)
         if options.jasmin == True:
           dex2jar()
           jar2jasmin()
@@ -166,7 +172,7 @@ def main():
           if options.smali == False and options.nosc == False:
             dex2jar()
             procyon()
-        call("cp "+tmp+project_name+"/ ./ -R",shell=True)
+        call(["cp", tmp+project_name+"/", "./", "-R"])
       else:
         print ("[ ERROR ] You must select a valid APK file!")
         exit(1)
@@ -181,7 +187,7 @@ def main():
         else:
           print ("[ ERROR ] Can't build apk with that source format. Only Jasmin or Smali supported")
         sign()
-        call("cp "+sign_file+" ./",shell=True)
+        call(["cp", sign_file, "./",])
     else:
       parser.error("action can be only 'b' (build) or 'd' (decompile)")
   else:
