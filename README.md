@@ -6,7 +6,7 @@ This project is a porting for Linux/*nix of https://github.com/rajivvishwa/apk2j
 
 Introduction
 --------------------
-This script decompiles an apk to its corresponding java sources. Security code review can be done on theses generated applicaion source files so as to identify any potential vulnerabilities present.
+This script decompiles an apk to its corresponding java sources. Security code review can be done on theses generated application source files so as to identify any potential vulnerabilities present.
 This is not made to encourage piracy/plagiarism.
 
  *** This script just automates the sequence in which various tools are initiated and does not handle any error events. You will have to go through the cmd verbose to figure out the problem.  ***
@@ -14,28 +14,26 @@ This is not made to encourage piracy/plagiarism.
 Usage
 --------------------
 ```
-Usage: apk2java.py action ApkFileName [options]
+Usage: apk2java.py <ApkFileName> [options]
 
-action can only be 'b' (for build) and 'd' (for decompile)
 Options:
   -h, --help   show this help message and exit
   --java       select java source format [DEFAULT]
   --smali      select smali source format
-  --jasmin     select jasmin source format
   --no-source  no source code generation
 ```
 
 Requirements
 --------------------
-JRE 1.7 (Java Runtime Environment)
-Python 3
+JRE >1.7 (Java Runtime Environment)
+Python >3
 
 
 Tools used
 --------------------
 Dex2jar : http://code.google.com/p/dex2jar/
 
-Procyon : https://bitbucket.org/mstrobel/procyon/wiki/Java%20Decompiler
+cfr : http://www.benf.org/other/cfr/
 
 apk-tool : http://code.google.com/p/android-apktool/
 
